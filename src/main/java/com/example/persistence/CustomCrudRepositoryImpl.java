@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import com.example.dto.QWebBoard;
+import com.example.dto.QWebReply;
 import com.example.dto.WebBoard;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPQLQuery;
@@ -31,6 +32,7 @@ public class CustomCrudRepositoryImpl extends QuerydslRepositorySupport implemen
 		log.info("====================");
 		
 		QWebBoard qWebBoard = QWebBoard.webBoard;
+		QWebReply qWebReply = QWebReply.webReply;
 		 
 		/*
 		  * 페이징 처리
@@ -41,8 +43,27 @@ public class CustomCrudRepositoryImpl extends QuerydslRepositorySupport implemen
 		
 		JPQLQuery<Tuple> tuple = query.select(qWebBoard.bno, qWebBoard.title, qWebBoard.regdate);
 		
+		tuple.leftJoin(qWebReply);
+		tuple.on(qWebBoard.bno.eq(qWebReply.board.bno));
 		tuple.where(qWebBoard.bno.gt(0L));
+		
+		if (type != null) {
+			switch (type.toLowerCase()) {
+			case "t":
+				tuple.where(qWebBoard.title.like("%" + keyword + "%"));
+				break;
+			case "c":
+				tuple.where(qWebBoard.content.like("%" + keyword + "%"));
+				break;
+			case "w":
+				tuple.where(qWebBoard.writer.like("%" + keyword + "%"));
+				break;
+			}
+		};
+		
+		tuple.groupBy(qWebBoard.bno);
 		tuple.orderBy(qWebBoard.bno.desc());
+		
 		tuple.offset(page.getOffset());
 		tuple.limit(page.getPageSize());
 		
