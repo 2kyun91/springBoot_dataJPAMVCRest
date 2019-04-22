@@ -63,6 +63,9 @@ public class CustomCrudRepositoryImpl extends QuerydslRepositorySupport implemen
 		
 		tuple.groupBy(qWebBoard.bno, qWebBoard.title, qWebBoard.writer, qWebBoard.regdate);
 		tuple.orderBy(qWebBoard.bno.desc());
+		
+		List<Tuple> selectAllList = tuple.fetch();
+		
 		tuple.offset(page.getOffset());
 		tuple.limit(page.getPageSize());
 		
@@ -73,8 +76,8 @@ public class CustomCrudRepositoryImpl extends QuerydslRepositorySupport implemen
 			resultList.add(t.toArray());
 		});
 		
-//		long total = tuple.fetchCount(); // fetchCount() 함수가 버전 4.x.x에서 오류를 발생하는 버그가 있다고 한다.
-		long total = list.size();
+//		long total = tuple.fetchCount(); // fetchCount() 함수가 버전 4.x.x에서 오류를 발생하는 버그가 있다고 한다, 67라인으로 대체한다.
+		long total = selectAllList.size();
 		
 		return new PageImpl<>(resultList, page, total);
 	}
