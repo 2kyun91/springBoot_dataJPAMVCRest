@@ -18,6 +18,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import com.example.dto.WebBoard;
 import com.example.page.PageMaker;
 import com.example.page.PageVO;
+import com.example.persistence.CustomCrudRepository;
 import com.example.persistence.WebBoardRepository;
 
 import lombok.extern.java.Log;
@@ -49,6 +50,10 @@ public class WebBoardController {
 	@Autowired
 	private WebBoardRepository webBoardRepository;
 	
+	// 동적으로 JPQL 주입
+	@Autowired
+	private CustomCrudRepository customCrudRepository;
+	
 	/*
 	 * 파라미터로 Model을 전달 받고 WebBoardRepository를 이용해서 페이지 처리를 진행한 결과를 result에 담는다.
 	 * 검색 기능을 처리하기 위해서 Predicate를 생성하는 부분을 전달받은 PageVo를 이용하도록 해야한다.
@@ -58,10 +63,9 @@ public class WebBoardController {
 	public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
 		Pageable page = vo.makePageable(0, "bno");
 		
-		// Page<WebBoard> result = webBoardRepository.findAll(webBoardRepository.makePredicate(null, null), page);
-		Page<WebBoard> result = webBoardRepository.findAll(webBoardRepository.makePredicate(vo.getType(), vo.getKeyword()), page);
-		
-		System.out.println("result : " + result);
+//		Page<WebBoard> result = webBoardRepository.findAll(webBoardRepository.makePredicate(null, null), page);
+//		Page<WebBoard> result = webBoardRepository.findAll(webBoardRepository.makePredicate(vo.getType(), vo.getKeyword()), page);
+		Page<Object[]> result = customCrudRepository.getCustomPage(vo.getType(), vo.getKeyword(), page);
 		
 		log.info("" + page);
 		log.info("" + result);

@@ -13,6 +13,7 @@ import com.example.dto.QWebReply;
 import com.example.dto.WebBoard;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.hibernate.AbstractHibernateQuery;
 
 import lombok.extern.java.Log;
 
@@ -40,8 +41,7 @@ public class CustomCrudRepositoryImpl extends QuerydslRepositorySupport implemen
 		  * Tuple에는 where(), orderBy()등의 기능을 이용해서 원하는 조건을 제어할 수 있다.
 		 */
 		JPQLQuery<WebBoard> query = from(qWebBoard);
-		
-		JPQLQuery<Tuple> tuple = query.select(qWebBoard.bno, qWebBoard.title, qWebBoard.regdate);
+		JPQLQuery<Tuple> tuple = query.select(qWebBoard.bno, qWebBoard.title, qWebReply.count(), qWebBoard.writer, qWebBoard.regdate);
 		
 		tuple.leftJoin(qWebReply);
 		tuple.on(qWebBoard.bno.eq(qWebReply.board.bno));
@@ -61,21 +61,20 @@ public class CustomCrudRepositoryImpl extends QuerydslRepositorySupport implemen
 			}
 		};
 		
-		tuple.groupBy(qWebBoard.bno);
+		tuple.groupBy(qWebBoard.bno, qWebBoard.title, qWebBoard.writer, qWebBoard.regdate);
 		tuple.orderBy(qWebBoard.bno.desc());
-		
 		tuple.offset(page.getOffset());
 		tuple.limit(page.getPageSize());
 		
 		List<Tuple> list = tuple.fetch(); // tuple.fetch()의 결과를 Collection에 담는다.
-		
 		List<Object[]> resultList = new ArrayList<>();
 		
 		list.forEach(t -> { // Object[] 형식으로 처리한다.
 			resultList.add(t.toArray());
 		});
 		
-		long total = tuple.fetchCount();
+//		long total = tuple.fetchCount(); // fetchCount() 함수가 버전 4.x.x에서 오류를 발생하는 버그가 있다고 한다.
+		long total = list.size();
 		
 		return new PageImpl<>(resultList, page, total);
 	}

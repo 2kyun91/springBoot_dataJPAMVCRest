@@ -26,18 +26,39 @@ public class CustomRepositoryTests {
 	@Autowired
 	CustomCrudRepository customCrudRepository;
 	
+//	@Test
+//	public void test1() {
+//		Pageable pageable = PageRequest.of(0, 10, Direction.DESC, "bno");
+//		
+//		String type = "t";
+//		String keyword = "10";
+//		
+//		Page<Object[]> result = customCrudRepository.getCustomPage(type, keyword, pageable);
+//		
+//		log.info("" + result);
+//		log.info("Total pages : " + result.getTotalPages()); // 전체 페이지 수 
+//		log.info("Total size : " + result.getTotalElements()); // 전체 데이터 수
+//		
+//		result.getContent().forEach(arr -> {
+//			log.info(Arrays.toString(arr));
+//		});
+//	}
+	
 	@Test
-	public void test1() {
+	public void testWriter() {
+		
 		Pageable pageable = PageRequest.of(0, 10, Direction.DESC, "bno");
 		
-		String type = "t";
-		String keyword = "10";
+		String type = "w";
+		String keyword = "user09";
 		
 		Page<Object[]> result = customCrudRepository.getCustomPage(type, keyword, pageable);
+
+		System.out.println("result : " + result);
 		
 		log.info("" + result);
-		log.info("Total pages : " + result.getTotalPages()); // 전체 페이지 수 
-		log.info("Total size : " + result.getTotalElements()); // 전체 데이터 수
+		log.info("TOTAL PAGES" + result.getTotalPages());
+		log.info("TOTAL SIZE" + result.getTotalElements());
 		
 		result.getContent().forEach(arr -> {
 			log.info(Arrays.toString(arr));
